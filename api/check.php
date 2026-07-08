@@ -411,10 +411,11 @@ function analyzeResponse($response, $card) {
     }
     
     // Default case - unknown response  
-    $truncatedBody = substr($body, 0, 200);
+    $cleanBody = trim(preg_replace('/\s+/', ' ', strip_tags($body)));
+    $truncatedBody = substr($cleanBody, 0, 200);
     return [
         'status' => 'unknown',
-        'message' => 'Resposta desconhecida - Status: ' . $statusCode . ' | Body: ' . $truncatedBody,
+        'message' => 'Resposta desconhecida - Status: ' . $statusCode . ' | Body: ' . htmlspecialchars($truncatedBody),
         'brand' => $detected_brand,
         'bank' => $detected_bank
     ];
