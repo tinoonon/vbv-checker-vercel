@@ -399,9 +399,22 @@
                 if (!card) continue;
 
                 try {
-                    const proxyValue = document.getElementById('proxyInput').value.trim();
+                    let proxyValue = document.getElementById('proxyInput').value.trim();
                     const bodyData = { lista: card };
-                    if (proxyValue) bodyData.proxy = proxyValue;
+                    
+                    if (proxyValue) {
+                        if (!proxyValue.startsWith('http') && !proxyValue.startsWith('socks')) {
+                            const parts = proxyValue.split(':');
+                            if (parts.length === 4) {
+                                // Formato IP:PORTA:USER:PASS => http://USER:PASS@IP:PORTA
+                                proxyValue = `http://${parts[2]}:${parts[3]}@${parts[0]}:${parts[1]}`;
+                            } else {
+                                // Outros formatos sem http (ex: IP:PORTA)
+                                proxyValue = `http://${proxyValue}`;
+                            }
+                        }
+                        bodyData.proxy = proxyValue;
+                    }
 
                     const response = await fetch('/api/check', {
                         method: 'POST',
