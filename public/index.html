@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VBV Checker - Verificador de Cartões</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            resize: vertical;
+            min-height: 150px;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .results-container {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results-container.show {
+            display: block;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .results-header h2 {
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .stat-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .stat-declined {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .stat-processing {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .results-list {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .result-item {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-status {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-declined {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-processing {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .result-details {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .result-card {
+            font-weight: 600;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .result-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #721c24;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #155724;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+
+            .stat-box {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 VBV Checker</h1>
+            <p>Verificador de Cartões com 3D Secure</p>
+        </div>
+
+        <div class="info-box">
+            <strong>📋 Como usar:</strong> Cole uma lista de cartões no formato <code>NUMERO|MES|ANO|CVV</code>, um por linha. Exemplo: <code>5122672221909912|02|2031|386</code>
+        </div>
+
+        <div class="form-group">
+            <label for="cardList">Lista de Cartões:</label>
+            <textarea id="cardList" placeholder="5122672221909912|02|2031|386&#10;4111111111111111|12|2025|123&#10;5555555555554444|01|2026|999"></textarea>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" id="processBtn" onclick="processCards()">▶ Iniciar Verificação</button>
+            <button class="btn-secondary" onclick="clearAll()">🗑️ Limpar</button>
+            <button class="btn-secondary" onclick="downloadResults()">⬇️ Baixar Resultados</button>
+        </div>
+
+        <div id="messageContainer"></div>
+
+        <div class="results-container" id="resultsContainer">
+            <div class="results-header">
+                <h2>Resultados</h2>
+            </div>
+
+            <div class="stats">
+                <div class="stat-box stat-approved">
+                    <div>✅ Aprovados</div>
+                    <div class="stat-number" id="approvedCount">0</div>
+                </div>
+                <div class="stat-box stat-declined">
+                    <div>❌ Reprovados</div>
+                    <div class="stat-number" id="declinedCount">0</div>
+                </div>
+                <div class="stat-box stat-processing">
+                    <div>⏳ Processados</div>
+                    <div class="stat-number" id="totalCount">0</div>
+                </div>
+            </div>
+
+            <div class="results-list" id="resultsList"></div>
+        </div>
+    </div>
+
+    <script>
+        let allResults = [];
+
+        async function processCards() {
+            const cardList = document.getElementById('cardList').value.trim();
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerHTML = '';
+
+            if (!cardList) {
+                showError('Por favor, insira pelo menos um cartão!');
+                return;
+            }
+
+            const cards = cardList.split('\n').filter(line => line.trim());
+            if (cards.length === 0) {
+                showError('Nenhum cartão válido encontrado!');
+                return;
+            }
+
+            const processBtn = document.getElementById('processBtn');
+            processBtn.disabled = true;
+            processBtn.textContent = '⏳ Processando...';
+
+            allResults = [];
+            showResults();
+
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i].trim();
+                if (!card) continue;
+
+                try {
+                    const response = await fetch('/api/check', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ lista: card })
+                    });
+
+                    const data = await response.json();
+                    allResults.push({
+                        card: card,
+                        status: data.status,
+                        message: data.message,
+                        bank: data.bank,
+                        brand: data.brand,
+                        time: data.time
+                    });
+
+                    updateResults();
+                } catch (error) {
+                    allResults.push({
+                        card: card,
+                        status: 'error',
+                        message: error.message,
+                        bank: 'N/A',
+                        brand: 'N/A',
+                        time: '0s'
+                    });
+                    updateResults();
+                }
+
+                // Pequeno delay entre requisições
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            processBtn.disabled = false;
+            processBtn.textContent = '▶ Iniciar Verificação';
+            showSuccess(`Verificação concluída! ${cards.length} cartão(s) processado(s).`);
+        }
+
+        function updateResults() {
+            const resultsList = document.getElementById('resultsList');
+            const approvedCount = allResults.filter(r => r.status === 'approved').length;
+            const declinedCount = allResults.filter(r => r.status === 'declined').length;
+
+            document.getElementById('approvedCount').textContent = approvedCount;
+            document.getElementById('declinedCount').textContent = declinedCount;
+            document.getElementById('totalCount').textContent = allResults.length;
+
+            resultsList.innerHTML = allResults.map((result, index) => `
+                <div class="result-item">
+                    <div class="result-status status-${result.status}">
+                        ${result.status === 'approved' ? '✅ APROVADA' : result.status === 'declined' ? '❌ REPROVADA' : '⚠️ ERRO'}
+                    </div>
+                    <div class="result-details">
+                        <div class="result-card">${maskCard(result.card)}</div>
+                        <div class="result-info">${result.brand} • ${result.bank} • ${result.time}</div>
+                        <div class="result-info" style="color: #999; font-size: 0.85em;">${result.message}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function maskCard(card) {
+            const parts = card.split('|');
+            if (parts.length < 4) return card;
+            const number = parts[0];
+            const masked = number.slice(0, 6) + '*'.repeat(number.length - 10) + number.slice(-4);
+            return `${masked}|${parts[1]}|${parts[2]}|***`;
+        }
+
+        function showResults() {
+            document.getElementById('resultsContainer').classList.add('show');
+        }
+
+        function showError(message) {
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+
+        function showSuccess(message) {
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerHTML = `<div class="success-message">${message}</div>`;
+        }
+
+        function clearAll() {
+            document.getElementById('cardList').value = '';
+            document.getElementById('messageContainer').innerHTML = '';
+            document.getElementById('resultsContainer').classList.remove('show');
+            allResults = [];
+        }
+
+        function downloadResults() {
+            if (allResults.length === 0) {
+                showError('Nenhum resultado para baixar!');
+                return;
+            }
+
+            let csv = 'Cartão,Status,Bandeira,Banco,Mensagem,Tempo\n';
+            allResults.forEach(result => {
+                const card = result.card.split('|')[0];
+                const masked = card.slice(0, 6) + '*'.repeat(card.length - 10) + card.slice(-4);
+                csv += `"${masked}","${result.status}","${result.brand}","${result.bank}","${result.message}","${result.time}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `vbv-results-${new Date().getTime()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
