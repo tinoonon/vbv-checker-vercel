@@ -1,5 +1,32 @@
 <?php
 
+// Handler global: garante que sempre seja retornado JSON válido
+set_exception_handler(function($e) {
+    if (!headers_sent()) {
+        header('Content-Type: application/json');
+    }
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Exceção PHP: ' . $e->getMessage()
+    ]);
+    exit;
+});
+
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        if (!headers_sent()) {
+            header('Content-Type: application/json');
+        }
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Erro fatal PHP: ' . $error['message']
+        ]);
+    }
+});
+
 require __DIR__ . 
 '/../vendor/autoload.php';
 
@@ -311,6 +338,8 @@ function analyzeVbvMessage($message) {
 
 header('Content-Type: application/json');
 
+try {
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['status' => 'error', 'message' => 'Método não permitido.']);
@@ -469,6 +498,13 @@ if (isset($confirm_data['status']) && $confirm_data['status'] === 'SUCCESS') {
     echo json_encode(['status' => 'declined', 'message' => $message, 'brand' => $detected_brand, 'bank' => $detected_bank, 'time' => $tempo . 's']);
 }
 
-$cookie->delete();
+    $cookie->delete();
 
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Erro interno: ' . $e->getMessage()
+    ]);
+}
 ?>
