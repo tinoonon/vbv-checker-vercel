@@ -1,10 +1,6 @@
 {
     "require": {
         "php": ">=7.4",
-        "guzzlehttp/guzzle": "^7.0",
-        "vlucas/phpdotenv": "^5.0"
-    },
-    "autoload": {
-        "files": ["api/CurlX.php", "api/CookieJar.php"]
+        "guzzlehttp/guzzle": "^7.0"
     }
 }

@@ -13,8 +13,6 @@ class ComposerStaticInit2a81ae4eb2342e0fa5994cb8e80e5c19
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
-        '5dd3a155eedb7d6b3b72d8063dd49c49' => __DIR__ . '/../..' . '/api/CurlX.php',
-        '6466372c619690cc273d46c731dd1c90' => __DIR__ . '/../..' . '/api/CookieJar.php',
     );
 
     public static $prefixLengthsPsr4 = array (
