@@ -164,18 +164,23 @@ function extractBankFields($html) {
 
 // ─── HTTP helper usando Guzzle com http_errors=false ────────────────────────
 
-function makeClient(GuzzleCookieJar $jar): Client {
-    return new Client([
+function makeClient(GuzzleCookieJar $jar, ?string $proxy = null): Client {
+    $opts = [
         'cookies'         => $jar,
-        'http_errors'     => false,   // NUNCA lança exceção em 4xx/5xx
+        'http_errors'     => false,
         'allow_redirects' => true,
         'timeout'         => 25,
+        'verify'          => false,
         'headers'         => [
             'User-Agent'      => 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
             'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language' => 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
         ],
-    ]);
+    ];
+    if ($proxy) {
+        $opts['proxy'] = $proxy;
+    }
+    return new Client($opts);
 }
 
 function httpGet(Client $client, string $url, array $headers = []): array {
@@ -219,6 +224,7 @@ try {
 
     $input = json_decode(file_get_contents('php://input'), true);
     $lista = $input['lista'] ?? null;
+    $proxy = $input['proxy'] ?? null;
 
     if (!$lista) {
         http_response_code(400);
@@ -265,7 +271,7 @@ try {
 
     // Cookie jar compartilhado entre TODAS as requisições (igual ao script original)
     $jar    = new GuzzleCookieJar();
-    $client = makeClient($jar);
+    $client = makeClient($jar, $proxy);
 
     // Step 1: Add to cart (cria sessão e cookie de carrinho)
     $r1 = httpGet($client, 'https://conteudoemais.com.br/finalizar-compra/?add-to-cart=30157');

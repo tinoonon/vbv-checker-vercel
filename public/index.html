@@ -330,6 +330,12 @@
             <textarea id="cardList" placeholder="5122672221909912|02|2031|386&#10;4111111111111111|12|2025|123&#10;5555555555554444|01|2026|999"></textarea>
         </div>
 
+        <div class="form-group">
+            <label for="proxyInput">🌐 Proxy (opcional - recomendado):</label>
+            <input type="text" id="proxyInput" placeholder="http://user:pass@ip:porta" style="width:100%;padding:12px 15px;border:2px solid #e0e0e0;border-radius:8px;font-family:'Courier New',monospace;font-size:1em;transition:border-color 0.3s;">
+            <small style="color:#888;margin-top:5px;display:block;">Use um proxy residencial para evitar bloqueios. Formatos: http://ip:porta ou http://user:pass@ip:porta</small>
+        </div>
+
         <div class="button-group">
             <button class="btn-primary" id="processBtn" onclick="processCards()">▶ Iniciar Verificação</button>
             <button class="btn-secondary" onclick="clearAll()">🗑️ Limpar</button>
@@ -393,12 +399,16 @@
                 if (!card) continue;
 
                 try {
+                    const proxyValue = document.getElementById('proxyInput').value.trim();
+                    const bodyData = { lista: card };
+                    if (proxyValue) bodyData.proxy = proxyValue;
+
                     const response = await fetch('/api/check', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ lista: card })
+                        body: JSON.stringify(bodyData)
                     });
 
                     const data = await response.json();
