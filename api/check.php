@@ -62,6 +62,7 @@ class CurlX {
             'timeout' => 30,
             'verify' => false,
             'decode_content' => true,
+            'http_errors' => false,
             'headers' => [
                 'User-Agent' => $userAgents[array_rand($userAgents)],
                 'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
@@ -383,7 +384,7 @@ function analyzeResponse($response, $card) {
                 'status' => 'approved',
                 'message' => 'Live Card ✅ - Transação Aprovada',
                 'brand' => $detected_brand,
-                'bank' => $detected_band
+                'bank' => $detected_bank
             ];
         }
     }
