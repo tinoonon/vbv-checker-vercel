@@ -60,11 +60,13 @@ class CurlX {
             'cookies' => $this->cookieJar,
             'allow_redirects' => true,
             'timeout' => 30,
+            'verify' => false,
+            'decode_content' => true,
             'headers' => [
                 'User-Agent' => $userAgents[array_rand($userAgents)],
                 'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                 'Accept-Language' => 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-                'Accept-Encoding' => 'gzip, deflate, br',
+                'Accept-Encoding' => 'gzip, deflate',
                 'DNT' => '1',
                 'Connection' => 'keep-alive',
                 'Upgrade-Insecure-Requests' => '1'
@@ -79,7 +81,13 @@ class CurlX {
             
             $response = $this->client->get($url, [
                 'query' => $params, 
-                'headers' => array_merge(['Referer' => 'https://amazonicocare.com.br/'], $headers)
+                'headers' => array_merge([
+                    'Referer' => 'https://amazonicocare.com.br/',
+                    'Cache-Control' => 'no-cache'
+                ], $headers),
+                'curl' => [
+                    CURLOPT_ENCODING => '', // Let curl handle encoding automatically
+                ]
             ]);
             return new CurlXResponse($response);
         } catch (\Exception $e) {
@@ -95,10 +103,15 @@ class CurlX {
             $defaultHeaders = [
                 'Referer' => 'https://amazonicocare.com.br/',
                 'Origin' => 'https://amazonicocare.com.br',
-                'X-Requested-With' => 'XMLHttpRequest'
+                'Cache-Control' => 'no-cache'
             ];
             
-            $options = ['headers' => array_merge($defaultHeaders, $headers)];
+            $options = [
+                'headers' => array_merge($defaultHeaders, $headers),
+                'curl' => [
+                    CURLOPT_ENCODING => '', // Let curl handle encoding automatically
+                ]
+            ];
             
             if (is_array($body)) {
                 $options['form_params'] = $body;
